@@ -35,9 +35,9 @@
 | user_md5 | md5 |
 | user_alice | scram-sha-256 |
 
-📸 Скриншот создания пользователей: ![Создание пользователей](task-3-users-created.png)
+Скриншот создания пользователей: ![Создание пользователей](task-3-users-created.png)
 
-📸 Скриншот методов шифрования: ![Методы шифрования](task-3-encryption-methods.png)
+Скриншот методов шифрования: ![Методы шифрования](task-3-encryption-methods.png)
 
 ---
 
@@ -52,11 +52,12 @@ psql -h 127.0.0.1 -U user_alice -d postgres
 Пароль: `AlicePassword456!`
 
 **Результат:** подключение успешно. Значит, аутентификация работает правильно.
-[(task-3-connect-success.png)](https://task-3-connect-success.png)
+Скриншот успешно: ![успешно](task-3-connect-success.png)
 
 
-Скриншот ошибки:
-[https://task-3-error.png](https://task-3-error.png)
+
+Скриншот ошибки: ![ошибка](task-3-encryption-methods.png)
+
 
 ---
 
