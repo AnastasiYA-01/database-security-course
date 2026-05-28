@@ -1,4 +1,4 @@
-﻿# Практическая работа №5: Детальная настройка привилегий
+# Практическая работа №5: Детальная настройка привилегий
 
 **Выполнила:** Еременко Анастасия  
 **Группа:** 607-41  
@@ -12,134 +12,78 @@
 
 **Список всех ролей:**
 
-`task-5-all-roles.png`
+![Все роли](task-5-all-roles.png)
 
-**Права на таблицы для app_user, app_manager, app_admin:**
+**Права на таблицы:**
 
-| Роль | Таблицы (чтение) | Таблицы (запись) | Последовательности | Схемы |
-|------|------------------|------------------|--------------------|-------|
-| app_user | SELECT на все таблицы | INSERT (comments, logs), UPDATE (tasks) | USAGE | USAGE на app |
-| app_manager | SELECT, INSERT, UPDATE, DELETE на все таблицы | Полный доступ | USAGE | USAGE на app |
-| app_admin | SELECT, INSERT, UPDATE, DELETE на все таблицы | Полный доступ | USAGE | CREATE на app |
+| Роль | Чтение | Запись |
+|------|--------|--------|
+| app_user | SELECT на все таблицы | INSERT (comments, logs), UPDATE (tasks) |
+| app_manager | SELECT, INSERT, UPDATE, DELETE | Полный доступ |
+| app_admin | SELECT, INSERT, UPDATE, DELETE | Полный доступ |
 
-Скриншот прав app_user: `task-5-app-user-final.png`  
-Скриншот прав app_manager: `task-5-app-manager-grants.png`  
-Скриншот прав app_admin: `task-5-app-administration.png`
+Права app_user: ![app_user права](task-5-app-user-final.png)
+
+Права app_manager: ![app_manager права](task-5-app-manager-grants.png)
+
+Права app_admin: ![app_admin права](task-5-app-admin-grants.png)
 
 ---
 
 ## Часть 2: Переработка системы привилегий
 
-### Задание 2.1. Сброс и пересоздание привилегий
+### Задание 2.2. Иерархия ролей-контейнеров
 
-Выполнен сброс прав через `REVOKE ALL PRIVILEGES`. После сброса права отсутствуют.
+Созданы роли-контейнеры: `app_connect`, `app_read_reference`, `app_read_main`, `app_comments_full`, `app_task_write`, `app_project_write`, `app_history_full`, `app_access_log_write`, `app_full_access`
 
-### Задание 2.2. Построение иерархии ролей-контейнеров
-
-Созданы роли-контейнеры:
-- `app_connect` — подключение к БД и схеме
-- `app_read_reference` — чтение справочников
-- `app_read_main` — чтение основных таблиц
-- `app_comments_full` — полный доступ к комментариям
-- `app_task_write` — чтение + запись задач
-- `app_project_write` — чтение + запись проектов
-- `app_history_full` — чтение + запись истории
-- `app_access_log_write` — запись в логи
-- `app_full_access` — полный доступ (для админа)
-
-`task-5-hierarchy.png`
+Иерархия: ![Иерархия ролей](task-5-hierarchy.png)
 
 ---
 
-## Часть 3: Назначение привилегий пользовательским ролям
+## Часть 3: Назначение привилегий
 
-### Задание 3.1. Настройка роли app_user
+### Задание 3.1-3.3. Настройка ролей
 
-- Базовое подключение: `app_connect`
-- Чтение справочников: `app_read_reference`
-- Чтение основных таблиц: `app_read_main`
-- Работа с задачами: `app_task_write` (SELECT, INSERT, UPDATE)
-- Комментарии: `app_comments_full`
-- История изменений: `app_history_full`
-- Логи доступа: `app_access_log_write`
-
-`task-5-app-user-final.png`
-
-### Задание 3.2. Настройка роли app_manager
-
-- Наследует все права `app_user`
-- Дополнительно: `app_project_write` (управление проектами)
-
-`task-5-app-manager-grants.png`
-
-### Задание 3.3. Настройка роли app_admin
-
-- Наследует все права `app_manager`
-- Полный доступ: `app_full_access`
-- Создание объектов в схеме: `CREATE ON SCHEMA app`
-
-`task-5-app-administration.png`
+| Роль | Наследует | Дополнительные права |
+|------|-----------|---------------------|
+| app_user | — | Чтение, комментарии, обновление статуса задач |
+| app_manager | app_user | Управление проектами |
+| app_admin | app_manager | Полный доступ, создание схем |
 
 ---
 
-## Часть 4: Настройка DEFAULT PRIVILEGES
+## Часть 5: Тестирование
 
-### Задание 4.1. Автоматизация предоставления прав
-
-Настроены `DEFAULT PRIVILEGES` для роли `app_admin`:
-- `app_read_reference` получает SELECT
-- `app_task_write` получает SELECT, INSERT, UPDATE, DELETE
-- `app_full_access` получает ALL
-
----
-
-## Часть 5: Тестирование привилегий
-
-### Задание 5.1. Тестирование роли app_user (dev_alice)
+### dev_alice (обычный пользователь)
 
 - ✅ Чтение проектов — работает
-- ❌ Вставка проекта — ошибка (permission denied)
+- ❌ Вставка проекта — ошибка
 
-`task-5-dev-alice-error.png`
+Ошибка: ![Ошибка dev_alice](task-5-dev-alice-error.png)
 
-### Задание 5.2. Тестирование роли app_manager (pm_bob)
+### pm_bob (менеджер)
 
 - ✅ Чтение проектов — работает
 - ✅ Вставка проекта — успешно
 
-`task-5-pm-bob-success.png`
-
-### Задание 5.3. Тестирование роли app_admin (admin_diana)
-
-- ✅ Полный доступ ко всем таблицам
-- ✅ Создание и удаление таблиц
+Успех: ![Успех pm_bob](task-5-pm-bob-success.png)
 
 ---
 
 ## Часть 6: Финальный аудит
 
-### Задание 6.1. Сводный отчёт
+### Матрица привилегий
 
-**Матрица привилегий по ролям:**
+| Роль | SELECT | INSERT | UPDATE | DELETE |
+|------|--------|--------|--------|--------|
+| app_user | ✅ | ограниченно | ✅ (только задачи) | ❌ |
+| app_manager | ✅ | ✅ | ✅ | ✅ |
+| app_admin | ✅ | ✅ | ✅ | ✅ |
 
-| Роль | SELECT | INSERT | UPDATE | DELETE | USAGE на схеме |
-|------|--------|--------|--------|--------|----------------|
-| app_user | ✅ | ✅ (ограниченно) | ✅ (только задачи) | ❌ | ✅ |
-| app_manager | ✅ | ✅ | ✅ | ✅ | ✅ |
-| app_admin | ✅ | ✅ | ✅ | ✅ | ✅ (CREATE) |
-
-`task-5-matrix.png`
-
-**Иерархия наследования:**
-- `app_user` ← `app_manager` ← `app_admin`
-
- `task-5-hierarchy.png`
+Матрица: ![Матрица привилегий](task-5-matrix.png)
 
 ---
 
 ## Вывод
 
-Привилегии настроены по принципу минимальных прав:
-- Обычный пользователь имеет только необходимые права (чтение, создание комментариев, обновление статуса задач)
-- Менеджер дополнительно управляет проектами
-- Администратор имеет полный доступ
+Привилегии настроены по принципу минимальных прав. Обычный пользователь имеет только необходимые права, менеджер управляет проектами, администратор имеет полный доступ.
