@@ -1,4 +1,4 @@
-﻿# Практическая работа №6: Row-Level Security (RLS)
+# Практическая работа №6: Row-Level Security (RLS)
 
 **Выполнила:** Еременко Анастасия  
 **Группа:** 607-41  
@@ -6,41 +6,47 @@
 
 ---
 
-## Что сделано
+## Часть 1: Подготовка данных
 
-### Часть 1. Подготовка данных
+**Список таблиц:**
 
-- Проверены таблицы в схеме `app` (8 таблиц)
-- Проверено количество данных
-- Проверены роли `app_user`, `app_manager`, `app_admin`
+![Список таблиц](task-6-tables-list.png)
 
-`task-6-tables-list.png`, 
-`task-6-data-count.png`, 
-`task-6-roles-check.png`, 
-`task-6-current-privileges.png`
+**Количество данных:**
 
----
+![Количество данных](task-6-data-count.png)
 
-### Часть 2. RLS для таблицы `tasks`
+**Проверка ролей:**
 
-- Включён RLS на `app.tasks`
-- Создана функция `app.get_current_user_id()`
-- Созданы политики для `app_user` (SELECT, INSERT, UPDATE, DELETE)
-- Созданы политики для `app_manager` и `app_admin`
+![Проверка ролей](task-6-roles-check.png)
 
-`task-6-enable-rls-tasks.png`, 
-`task-6-check-rls-tasks.png`
+**Текущие привилегии:**
+
+![Текущие привилегии](task-6-current-privileges.png)
 
 ---
 
-### Часть 4. RLS для таблицы `users`
+## Часть 2: RLS для таблицы tasks
 
-- Пользователи в таблице: `alice`, `bob`, `charlie`, `diana`, `dev_alice`
-- У `dev_alice` есть задача
+**Включение RLS:**
 
-`task-6-all-users.png`, 
-`task-6-dev-alice-id.png`, 
-`task-6-tasks-for-dev-alice.png`
+![Включение RLS](task-6-enable-rls-tasks.png)
+
+**Проверка RLS:**
+
+![Проверка RLS](task-6-check-rls-tasks.png)
+
+---
+
+## Часть 4: RLS для таблицы users
+
+**Все пользователи:**
+
+![Все пользователи](task-6-all-users.png)
+
+**Задачи для dev_alice:**
+
+![Задачи для dev_alice](task-6-tasks-for-dev-alice.png)
 
 ---
 
@@ -48,13 +54,12 @@
 
 | Роль | Действие | Результат |
 |------|----------|-----------|
-| `dev_alice` (app_user) | SELECT из tasks | показывает только свои задачи |
-| `pm_bob` (app_manager) | SELECT из tasks | показывает задачи своих проектов |
-| `admin_diana` (app_admin) | SELECT из tasks | показывает все задачи |
+| dev_alice (app_user) | SELECT из tasks | показывает только свои задачи |
+| pm_bob (app_manager) | SELECT из tasks | показывает задачи своих проектов |
+| admin_diana (app_admin) | SELECT из tasks | показывает все задачи |
 
 ---
 
 ## Вывод
 
-RLS настроен для таблиц `tasks`, `comments`, `projects`, `users`.  
-Пользователи видят только те строки, которые им разрешено видеть по политикам.
+RLS настроен для таблиц `tasks`, `comments`, `projects`, `users`. Пользователи видят только те строки, которые им разрешено видеть по политикам.
