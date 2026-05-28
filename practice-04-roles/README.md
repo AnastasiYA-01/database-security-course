@@ -1,4 +1,4 @@
-﻿# Практическая работа №4: Создание иерархии ролей (администратор, менеджер, пользователь)
+﻿# Практическая работа №4: Создание иерархии ролей
 
 **Выполнила:** Еременко Анастасия  
 **Группа:** 607-41  
@@ -21,7 +21,7 @@
 - `task_history` — история изменений
 - `access_logs` — логи доступа
 
-`task-4-database-created.png`
+Скриншот базы данных: ![База данных](task-4-database-created.png)
 
 **Тестовые данные:**
 
@@ -34,7 +34,7 @@
 | 3 | charlie | Charlie Brown | IT | Specialist |
 | 4 | diana | Diana Prince | Marketing | Specialist |
 
-`task-4-users-table.png`
+Скриншот таблицы users: ![Пользователи](task-4-users-table.png)
 
 ---
 
@@ -42,69 +42,59 @@
 
 ### Задание 2.1: Матрица привилегий
 
-| Объект / Операция | app_user (Пользователь) | app_manager (Менеджер) | app_admin (Администратор) |
-|-------------------|------------------------|------------------------|---------------------------|
-| app.users — SELECT | Только свои данные | Все пользователи | Все + системные поля |
-| app.users — INSERT/UPDATE | — | — | ✓ Все операции |
-| app.projects — SELECT | Свои проекты | Все проекты | Все проекты |
-| app.projects — INSERT/UPDATE | — | Свои проекты | Все проекты |
-| app.tasks — SELECT | Свои задачи | Все задачи в проектах | Все задачи |
-| app.tasks — INSERT | — | ✓ В свои проекты | ✓ Все |
-| app.tasks — UPDATE | Статус своих задач | Любые поля в своих проектах | Все |
-| app.tasks — DELETE | — | Свои проекты | Все |
-| app.comments — SELECT | Не-внутренние | Все (вкл. is_internal) | Все |
-| app.comments — INSERT/UPDATE | Свои комментарии | Все + is_internal | Все |
-| app.task_history — SELECT | — | Свои проекты | Все |
-| app.access_logs — SELECT | — | — | ✓ Все |
-| DDL операции (CREATE/ALTER/DROP) | — | — | В своей схеме |
+| Объект / Операция | app_user | app_manager | app_admin |
+|-------------------|----------|-------------|-----------|
+| users — SELECT | Только свои данные | Все пользователи | Все |
+| users — INSERT/UPDATE | — | — | ✅ |
+| projects — SELECT | Свои проекты | Все проекты | Все |
+| projects — INSERT/UPDATE | — | Свои проекты | Все |
+| tasks — SELECT | Свои задачи | Все задачи | Все |
+| tasks — INSERT | — | В свои проекты | Все |
+| tasks — UPDATE | Статус своих задач | Любые поля | Все |
+| tasks — DELETE | — | Свои проекты | Все |
+| comments — SELECT | Не-внутренние | Все | Все |
+| comments — INSERT/UPDATE | Свои комментарии | Все | Все |
+| task_history — SELECT | — | Свои проекты | Все |
+| access_logs — SELECT | — | — | ✅ |
+| DDL операции | — | — | ✅ |
 
 ### Задание 2.2: Диаграмма иерархии ролей
 
 ![Диаграмма иерархии ролей](role-hierarchy.png)
 
-*(файл `role-hierarchy.png` добавлен в папку)*
-
 ---
 
 ## Часть 3: Реализация системы ролей
 
-### Задание 3.1: Создание базовых ролей-контейнеров (без LOGIN)
+### Задание 3.1: Роли-контейнеры (без LOGIN)
 
-| Роль | Назначение |
-|------|------------|
-| `app_connect` | Подключение к БД и схеме |
-| `app_read_all` | Чтение всех таблиц |
-| `app_read_reference` | Чтение справочников |
-| `app_task_worker` | Работа с задачами и комментариями |
-| `app_internal_comments` | Просмотр внутренних комментариев |
-| `app_history_read` | Чтение истории изменений |
-| `app_audit_read` | Чтение логов доступа |
+Созданы роли: `app_connect`, `app_read_all`, `app_read_reference`, `app_task_worker`, `app_internal_comments`, `app_history_read`, `app_audit_read`
 
-`task-4-container-roles.png`
+Скриншот: ![Роли-контейнеры](task-4-container-roles.png)
 
-### Задание 3.2: Создание пользовательских ролей
+### Задание 3.2: Пользовательские роли
 
 | Роль | Атрибуты | Наследует |
 |------|----------|-----------|
-| `app_user` | LOGIN, CONNECTION LIMIT 20 | app_connect, app_read_reference, app_task_worker |
-| `app_manager` | LOGIN, CONNECTION LIMIT 50 | app_user, app_internal_comments, app_history_read |
-| `app_admin` | LOGIN, CREATEDB, CONNECTION LIMIT 10 | app_manager + полный доступ |
+| `app_user` | LOGIN, LIMIT 20 | app_connect, app_read_reference, app_task_worker |
+| `app_manager` | LOGIN, LIMIT 50 | app_user + app_internal_comments + app_history_read |
+| `app_admin` | LOGIN, CREATEDB, LIMIT 10 | app_manager + полный доступ |
 
-`task-4-all-roles-list.png`
+Скриншот списка ролей: ![Список ролей](task-4-all-roles-list.png)
 
-### Задание 3.3: Создание тестовых пользователей
+### Задание 3.3: Тестовые пользователи
 
-| Пользователь | Роль | Пароль |
-|--------------|------|--------|
-| `dev_alice` | app_user | AliceDev123! |
-| `pm_bob` | app_manager | BobPM456! |
-| `admin_diana` | app_admin | DianaAdmin012! |
+| Пользователь | Роль |
+|--------------|------|
+| dev_alice | app_user |
+| pm_bob | app_manager |
+| admin_diana | app_admin |
 
 ---
 
-## Часть 4: Тестирование системы доступа
+## Часть 4: Тестирование
 
-### Задание 4.1: Тестирование роли app_user (dev_alice)
+### Тест dev_alice (обычный пользователь)
 
 ```sql
 SET ROLE dev_alice;
