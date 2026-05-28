@@ -56,7 +56,7 @@ psql -h 127.0.0.1 -U user_alice -d postgres
 
 
 
-Скриншот ошибки: ![ошибка](task-3-encryption-methods.png)
+Скриншот ошибки: ![ошибка](task-3-error.png)
 
 
 ---
